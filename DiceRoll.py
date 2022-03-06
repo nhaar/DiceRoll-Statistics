@@ -76,41 +76,42 @@ dice = SequenceSum(dicenew) #And then we finally sum the list we just created
 
 # We have the distribution of the sum of all the dice already. Here onwards is to get the advantage 
 
-def L(x): #This function is the chance of getting a number lower than x in a distribution
-    chance = 0
-    for y in dice:
-        if y < x:
-            chance += dice[y]
-    return chance
-
-def M(x): #And this one is the same as L, for for getting a number higher than x
-    chance = 0
-    for y in dice:
-        if y > x:
-            chance += dice[y]
-    return chance
-
-def A(x, m, function): #This applies the advantage to get the probability of rolling "x" when you have "m" advantages, use function "L" for positive advantage and "M" for negative advantage
-    m += 1
-    chance = 0
-    for i in range(1,m):
-        chance += factorial(m)/factorial(i)/factorial(m-i)*function(x)**i*dice[x]**(m-i) #This uses the binomial theorem for probabilities, excluding the case where all numbers are lower/bigger than x
-    chance += dice[x]**m
-    return chance
-
-advantagedice = {}
-
-if advantage != 0: #This applies advantage to the distribution
-    if advantage > 0:
-        for x in dice:
-            advantagedice[x] = A(x, advantage, L)
+def Advantage(a, dist):
+    if a == 0:
+        return dist
     else:
-        for x in dice:
-            advantagedice[x] = A(x, abs(advantage), M)
-else:
-        advantagedice = dice
+        def L(x,z): #This function is the chance of getting a number lower than x in a distribution z
+            chance = 0
+            for y in dice:
+                if y < x:
+                    chance += z[y]
+            return chance
 
-dice = advantagedice
+        def M(x,z): #And this one is the same as L, for for getting a number higher than x
+            chance = 0
+            for y in dice:
+                if y > x:
+                    chance += z[y]
+            return chance
+
+        def A(x, m, function,z): #This applies the advantage to get the probability of rolling "x" when you have "m" advantages, use function "L" for positive advantage and "M" for negative advantage
+            m += 1
+            chance = 0
+            for i in range(1,m):
+                chance += factorial(m)/factorial(i)/factorial(m-i)*function(x,z)**i*z[x]**(m-i) #This uses the binomial theorem for probabilities, excluding the case where all numbers are lower/bigger than x
+            chance += z[x]**m
+            return chance
+
+        advantagedice = {}
+        if a > 0: #This applies advantage to the distribution
+            for x in dist:
+                advantagedice[x] = A(x, a, L, dist)
+        else:
+            for x in dice:
+                advantagedice[x] = A(x, abs(a), M, dist)
+        return advantagedice
+
+dice = Advantage(advantage, dice)
 
 # This part is to plot the graph of the distribution with matplotlib
 
