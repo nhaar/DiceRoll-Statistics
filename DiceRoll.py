@@ -57,7 +57,7 @@ def DistributionMultiply(dist,m): #Takes a distribution and the value you want t
         newdist = DistributionSum(dist,newdist)
     return newdist
 
-def SequenceSum(list): #This will take a LIST of distributions and sum them all
+def MultipleSum(list): #This will take a LIST of distributions and sum them all
     newlist = list[0]
     for x in range(1,len(list)):
         newlist = DistributionSum(list[x],newlist)
@@ -72,7 +72,7 @@ for x in dice: #We make a list with all the dice used, using the initial input a
         x_dist[y] = 1/x
     dicenew.append(DistributionMultiply(x_dist,dice[x])) #We generated a dictionary that was the form {dice : number_of_occurences,...} so we just go through every member and multiply it by the number of ocurrences
 
-dice = SequenceSum(dicenew) #And then we finally sum the list we just created
+dice = MultipleSum(dicenew) #And then we finally sum the list we just created
 
 # We have the distribution of the sum of all the dice already. Here onwards is to get the advantage 
 
@@ -82,14 +82,14 @@ def Advantage(a, dist):
     else:
         def L(x,z): #This function is the chance of getting a number lower than x in a distribution z
             chance = 0
-            for y in dice:
+            for y in z:
                 if y < x:
                     chance += z[y]
             return chance
 
         def M(x,z): #And this one is the same as L, for for getting a number higher than x
             chance = 0
-            for y in dice:
+            for y in z:
                 if y > x:
                     chance += z[y]
             return chance
@@ -107,7 +107,7 @@ def Advantage(a, dist):
             for x in dist:
                 advantagedice[x] = A(x, a, L, dist)
         else:
-            for x in dice:
+            for x in dist:
                 advantagedice[x] = A(x, abs(a), M, dist)
         return advantagedice
 
@@ -115,21 +115,30 @@ dice = Advantage(advantage, dice)
 
 # This part is to plot the graph of the distribution with matplotlib
 
-xpoints = []
-ypoints = []
-for x in dice:
-    xpoints.append(x)
-    ypoints.append(dice[x])
+def plotDist(dist):
+    xpoints = []
+    ypoints = []
+    for x in dist:
+        xpoints.append(x)
+        ypoints.append(dist[x])
 
-xpoints = np.array(xpoints)
-ypoints = np.array(ypoints)
-plt.plot(xpoints, ypoints, 'o')
-plt.show()
+    xpoints = np.array(xpoints)
+    ypoints = np.array(ypoints)
+    plt.plot(xpoints, ypoints, 'o')
+    plt.show()
+
+plotDist(dice)
 
 # This part is to export the results as a .tsv using pandas
 
-probability_density = {"Number":xpoints,"Probabiltiy":ypoints}
+def export(dist):
+    probability_density = {"Number":[],"Probability":[]}
+    for x in dist:
+        probability_density["Number"].append(x)
+        probability_density["Probability"].append(dist[x])
 
-results = pd.DataFrame(probability_density)
-results.sort_values(by=["Number"], inplace=True)
-results.to_csv(r'Dicerolls.tsv', index = False, sep ="\t")
+    results = pd.DataFrame(probability_density)
+    results.sort_values(by=["Number"], inplace=True)
+    results.to_csv(r'Dicerolls.tsv', index = False, sep ="\t")
+
+export(dice)
