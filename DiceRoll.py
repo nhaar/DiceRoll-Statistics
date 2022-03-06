@@ -98,13 +98,19 @@ def A(x, m, function): #This applies the advantage to get the probability of rol
     chance += dice[x]**m
     return chance
 
+advantagedice = {}
+
 if advantage != 0: #This applies advantage to the distribution
     if advantage > 0:
         for x in dice:
-            dice[x] = A(x, advantage, L)
+            advantagedice[x] = A(x, advantage, L)
     else:
         for x in dice:
-            dice[x] = A(x, abs(advantage), M)
+            advantagedice[x] = A(x, abs(advantage), M)
+else:
+        advantagedice = dice
+
+dice = advantagedice
 
 # This part is to plot the graph of the distribution with matplotlib
 
