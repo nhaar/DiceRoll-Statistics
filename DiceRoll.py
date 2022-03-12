@@ -41,6 +41,10 @@ def decodeDice(x): #Function to convert notation into a dictionary of the dice u
 
 # Whenever I say "distribution" coming up next, I mean a dictionary of the form {x1:y1,x2:y2,...}, where yi is the chance of getting xi, so therefore any number not listed is 0 (It's a discrete distribution)
 
+def Dice(n): #Creates a distribution for a n-sided die (equal probabilities)
+    newdist = {i:1/n for i in range(1,n+1)}
+    return newdist
+
 def DistributionSum(dist1,dist2): #Sums two different distribution, and returns the sum of them
     newdist = {}
     for z in range(min(dist1)+min(dist2),max(dist1)+max(dist2)+1):
@@ -49,6 +53,17 @@ def DistributionSum(dist1,dist2): #Sums two different distribution, and returns 
             if y in dist1 and (z-y) in dist2:
                 total += dist1[y] * dist2[z-y]
         newdist[z] = total
+    return newdist
+
+def DistributionNegative(dist):
+    newdist = {-x:dist[x] for x in dist}
+    return newdist
+
+def DistributionSubtract(dist1,dist2): #Similar to sum, but with subtracting, in the form dist1-dist2
+    return DistributionSum(dist1,DistributionNegative(dist2))
+
+def DistScalarMultiply(dist, m): #Multiply every number in the distribution
+    newdist = {m*x:dist[x] for x in dist}
     return newdist
 
 def DistributionMultiply(dist,m): #Takes a distribution and the value you want to multiply it by, then returns a distribution that is equal to summing itself m times
